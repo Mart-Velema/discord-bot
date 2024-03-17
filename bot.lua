@@ -57,9 +57,14 @@ client:on('messageCreate', function(message)
         {
             REQUEST = 'LIST_SERVICES',
         }
-        Dump(Api(content))
-        DumpToDiscord(Api(content))
-        print(Api(content)[3])
+        local responce = Api(content)
+        for serviceId, serviceName in ipairs(responce) do
+            print(serviceName)
+            if  serviceId >= 5 then
+                message.channel:send( serviceName)
+            end
+        end
+        message.channel:send("use `!join <service name>:<username of service>` to join that service")
     end
 
     --Add a user to the services database
@@ -156,15 +161,6 @@ function Dump(o)
         end
     end
  end
-
- function DumpToDiscord(o)
-    if type(o) == '!table' then
-        for serviceName in ipairs(o) do
-            print(serviceName)
-            discordia.message.channel:send('service name: ' .. serviceName)
-        end
-    end
-end
 
 --Function to handle API calls
 function Api(content)
