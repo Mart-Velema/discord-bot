@@ -1,28 +1,29 @@
-local discordia = require('discordia')
-local json = require('json')
-local http = require('coro-http')
-local client = discordia.Client()
+Discordia = require('discordia')
+Json = require('json')
+Http = require('coro-http')
+Client = Discordia.Client()
 
 local file = io.open("discord-bot/settings.json", "r")
 if file then
     local content = file:read("*a")
     file:close()
-    Settings = json.decode(content)
+    Settings = Json.decode(content)
 else
     print("Failed to find settings file, shutdown")
     os.exit()
 end
 
-client:on('ready', function ()
-    print('Logged in as' .. client.user.username)
+Client:on('ready', function ()
+    print('Logged in as' .. Client.user.username)
 end)
 
-client:on('messageCreate', function(message)
+Client:on('messageCreate', function(message)
     --Detect if message is form a bot, don't do anything else if so
     if message.author.bot then
         print('Mesasge was from a bot, ignore') return
     end
-
+    -- print(message.content)
+    -- print(message.author)
     --Random API images
     --Reply with a random fox image when someone says !foxpic
     if message.content == '!foxpic' then
@@ -58,10 +59,14 @@ client:on('messageCreate', function(message)
             REQUEST = 'LIST_SERVICES',
         }
         local responce = Api(content)
-        for serviceId, serviceName in ipairs(responce) do
-            if  serviceId >= 5 then
-                message.channel:send( serviceName)
-            end
+        if type(responce) == 'table' then
+            for serviceId, serviceName in ipairs(responce) do
+                if  serviceId >= 5 then
+                    message.channel:send( serviceName)
+                end
+            end 
+        else
+            message.channel:send(responce)
         end
         message.channel:send("use `!join <service name>:<username of service>` to join that service")
     end
@@ -70,6 +75,9 @@ client:on('messageCreate', function(message)
     --format - !join service:serviceAccountName
     if message.content:sub(1, 5) == '!join' then
         local service = message.content:sub(6)
+        if not string.find(service, ":") then
+            message.channel:send('Syntax error. To join a service, type `!join <serviceName>:<serviceAccountName>`') return
+        end
         --substring replacement
         local serviceTable = {}
         for substring in string.gmatch(service, "[^:]+") do
@@ -79,7 +87,7 @@ client:on('messageCreate', function(message)
         local content =
         {
             REQUEST = 'UPDATE_SERVICE',
-            USER_ID = message.member.guild.id,
+            USER_ID = message.author['user'],
             ACCOUNT_NAME = serviceTable[2],
             SERVICE = serviceTable[1]
         }
@@ -145,11 +153,11 @@ end)
 
 --Function to turn a random api url into an image
 function GetRandomImage(url)
-    local ok, res, body = pcall(http.request, "GET", url)
+    local ok, res, body = pcall(Http.request, "GET", url)
     if not ok or res.code ~= 200 then
         print("Failed to connect to api: ".. res.reason) return
     end
-    return json.decode(body)
+    return Json.decode(body)
 end
 
 --Function to dump an array/ table
@@ -163,7 +171,6 @@ function Dump(o)
 
 --Function to handle API calls
 function Api(content)
-
     if not type(content) == 'table' then
         print("Input must be type of table, something else has been supplied") 
         return "Failed to add user to database"
@@ -172,17 +179,21 @@ function Api(content)
     end
 
     local url = Settings['APIURL']
-    local body = json.encode(content)
+    local body = Json.encode(content)
     local headers ={{'Content-Type', 'application/json'}}
 
-    local ok, res, body = pcall(http.request, "POST", url, headers, body, 5000)
+    local ok, res, body = pcall(Http.request, "POST", url, headers, body, 5000)
 
     if not ok or res.code < 200 or res.code >= 300 then
         print("Failed to connect to api: ".. res.reason) return
     end
 
-    print(body)
-    return json.decode(body)['responce']
+    local body = Json.decode(body)
+    if type(body) == 'table' then
+        return body['responce']
+    else
+        return 'Server unreachable, please contact administrator ERROR 0'
+    end
 end
 
-client:run('Bot ' .. Settings['BOTTOKEN'])
+Client:run('Bot ' .. Settings['BOTTOKEN'])
