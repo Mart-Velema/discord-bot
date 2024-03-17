@@ -20,10 +20,8 @@ end)
 Client:on('messageCreate', function(message)
     --Detect if message is form a bot, don't do anything else if so
     if message.author.bot then
-        print('Mesasge was from a bot, ignore') return
+        return
     end
-    -- print(message.content)
-    -- print(message.author)
     --Random API images
     --Reply with a random fox image when someone says !foxpic
     if message.content == '!foxpic' then
@@ -56,19 +54,19 @@ Client:on('messageCreate', function(message)
         message.channel:send('Getting list of available services...')
         local content =
         {
-            REQUEST = 'LIST_SERVICES',
+            REQUEST = 'LIST_SERVICES'
         }
         local responce = Api(content)
         if type(responce) == 'table' then
             for serviceId, serviceName in ipairs(responce) do
                 if  serviceId >= 5 then
-                    message.channel:send( serviceName)
+                    message.channel:send(serviceName)
                 end
-            end 
+            end
+            message.channel:send("use `!join <service name>:<username of service>` to join that service")
         else
             message.channel:send(responce)
         end
-        message.channel:send("use `!join <service name>:<username of service>` to join that service")
     end
 
     --Add a user to the services database
@@ -181,8 +179,8 @@ function Dump(o)
 --Function to handle API calls
 function Api(content)
     if not type(content) == 'table' then
-        print("Input must be type of table, something else has been supplied") 
-        return "Failed to add user to database"
+        print("Input must be type of table, something else has been supplied")
+        return "Server unreachable, please contact administrator ERROR 2"
     else
         content['PASSWD'] = Settings['PASSWD']
     end
@@ -197,11 +195,12 @@ function Api(content)
         print("Failed to connect to api: ".. res.reason) return
     end
 
-    local body = Json.decode(body)
-    if type(body) == 'table' then
-        return body['responce']
+    local responce = Json.decode(body)
+    if type(responce) == 'table' then
+        return responce['responce']
     else
-        return 'Server unreachable, please contact administrator ERROR 0'
+        print('HTTP output: ' .. body)
+        return 'Server unreachable, please contact administrator ERROR 2'
     end
 end
 
