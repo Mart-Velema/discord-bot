@@ -141,6 +141,15 @@ Client:on('messageCreate', function(message)
         message.channel:send("PREPARE TO BE BANNE... Eh... Pardonned I guess?")
     end
 
+    --reload command
+    if message.content == '!reload' then
+        local content =
+        {
+            REQUEST = 'RELOAD'
+        }
+        message.channel:send(Api(content))
+    end
+
     --Kill command :3
     if message.content == '!fuck-off!' then
         if not message.member:hasPermission("banMember") then
