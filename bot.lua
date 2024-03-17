@@ -7,7 +7,7 @@ local file = io.open("discord-bot/settings.json", "r")
 if file then
     local content = file:read("*a")
     file:close()
-    settings = json.decode(content)
+    Settings = json.decode(content)
 else
     print("Failed to find settings file, shutdown")
     os.exit()
@@ -59,7 +59,6 @@ client:on('messageCreate', function(message)
         }
         local responce = Api(content)
         for serviceId, serviceName in ipairs(responce) do
-            print(serviceName)
             if  serviceId >= 5 then
                 message.channel:send( serviceName)
             end
@@ -169,10 +168,10 @@ function Api(content)
         print("Input must be type of table, something else has been supplied") 
         return "Failed to add user to database"
     else
-        content['PASSWD'] = settings['PASSWD']
+        content['PASSWD'] = Settings['PASSWD']
     end
 
-    local url = settings['APIURL']
+    local url = Settings['APIURL']
     local body = json.encode(content)
     local headers ={{'Content-Type', 'application/json'}}
 
@@ -186,4 +185,4 @@ function Api(content)
     return json.decode(body)['responce']
 end
 
-client:run('Bot ' .. settings['BOTTOKEN'])
+client:run('Bot ' .. Settings['BOTTOKEN'])
