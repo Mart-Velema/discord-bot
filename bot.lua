@@ -133,6 +133,7 @@ Client:on('messageCreate', function(message)
         }
         message.channel:send("PREPARE TO BE BANNED UwU " .. member.mentionString)
         message.channel:send(Api(content))
+        member:ban()
     end
 
     --Unban command
@@ -155,6 +156,7 @@ Client:on('messageCreate', function(message)
         }
         message.channel:send("PREPARE TO BE BANNE... Eh... Pardonned I guess?")
         message.channel:send(Api(content))
+        member:unban()
     end
 
     --Have you mooed today?
@@ -172,7 +174,7 @@ Client:on('messageCreate', function(message)
 
     --reload command
     if message.content == '!reload' then
-        if os.time() >= Time then
+        if os.time() >= Time  or message.guild:getMember(message.author.id):hasPermission('banMembers') then
             local content =
             {
                 REQUEST = 'RELOAD'
@@ -186,10 +188,10 @@ Client:on('messageCreate', function(message)
 
     --Kill command :3
     if message.content == '!fuck-off!' then
-        message.channel:send("Fucking off...")
-        if not message.member:hasPermission("banMember") then
+        if not message.member:hasPermission("banMembers") then
             message.channel:reply("You cannot stop me! :3") return
         end
+        message.channel:send("Fucking off...")
         os.exit()
     end
 end)
