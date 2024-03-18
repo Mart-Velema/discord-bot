@@ -87,7 +87,7 @@ Client:on('messageCreate', function(message)
         local content =
         {
             REQUEST = 'UPDATE_SERVICE',
-            USER_ID = message.author['user'],
+            USER_ID = message.author.id,
             ACCOUNT_NAME = serviceTable[2],
             SERVICE = serviceTable[1]
         }
@@ -124,11 +124,19 @@ Client:on('messageCreate', function(message)
             message:reply("You do not have the `banMembers` permissions :3")
             return
         end
+
+        local content=
+        {
+            REQUEST = 'BAN',
+            USER_ID = member.id,
+            REASON = 'You have been banned by an administrator'
+        }
         message.channel:send("PREPARE TO BE BANNED UwU " .. member.mentionString)
+        message.channel:send(Api(content))
     end
 
     --Unban command
-    if message.content:sub(1, 7) == '!pardon' then
+    if message.content:sub(1, 7) == '!pardon' or message.content:sub(1, 6) == '!unban' then
         local author = message.guild:getMember(message.author.id)
         local member = message.mentionedUsers.first
 
@@ -139,7 +147,27 @@ Client:on('messageCreate', function(message)
             message:reply("You do not have the `banMembers` permissions :3")
             return
         end
+
+        local content=
+        {
+            REQUEST = 'UNBAN',
+            USER_ID = member.id,
+        }
         message.channel:send("PREPARE TO BE BANNE... Eh... Pardonned I guess?")
+        message.channel:send(Api(content))
+    end
+
+    --Have you mooed today?
+    if message.content == '!moo' then
+        message.channel:send(
+            '```                   (__)        \n' ..
+            '                   (oo)        \n' ..
+            '             /------\\/         \n' ..
+            '           / |    ||           \n' ..
+            '          *  /\\---/\\           \n' ..
+            '             ~~   ~~           \n' ..
+            '..."Have you mooed today?"...  ```'
+        )
     end
 
     --reload command
@@ -158,10 +186,10 @@ Client:on('messageCreate', function(message)
 
     --Kill command :3
     if message.content == '!fuck-off!' then
+        message.channel:send("Fucking off...")
         if not message.member:hasPermission("banMember") then
             message.channel:reply("You cannot stop me! :3") return
         end
-        message.channel:send("Fucking off...")
         os.exit()
     end
 end)
@@ -188,7 +216,7 @@ function Dump(o)
 function Api(content)
     if not type(content) == 'table' then
         print("Input must be type of table, something else has been supplied")
-        return "Server unreachable, please contact administrator ERROR 2"
+        return "Syntax error, please contact administrator"
     else
         content['PASSWD'] = Settings['PASSWD']
     end
