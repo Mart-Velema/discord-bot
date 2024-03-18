@@ -15,6 +15,7 @@ end
 
 Client:on('ready', function ()
     print('Logged in as' .. Client.user.username)
+    Time = os.time()
 end)
 
 Client:on('messageCreate', function(message)
@@ -22,6 +23,7 @@ Client:on('messageCreate', function(message)
     if message.author.bot then
         return
     end
+
     --Random API images
     --Reply with a random fox image when someone says !foxpic
     if message.content == '!foxpic' then
@@ -104,6 +106,7 @@ Client:on('messageCreate', function(message)
             '!ping: Pong!\n' ..
             '!ban: bans a specific user from all services and discord server\n' ..
             '!pardon: removes all bans of specific user\n' ..
+            '!reload: Reloads all the bans and whitelists from the database. Can only be used once an hour\n' ..
             '!list: prints a list of all the available services\n' ..
             '!join: Allows you to join any of the available services\n```'
         )
@@ -141,11 +144,16 @@ Client:on('messageCreate', function(message)
 
     --reload command
     if message.content == '!reload' then
-        local content =
-        {
-            REQUEST = 'RELOAD'
-        }
-        message.channel:send(Api(content))
+        if os.time() >= Time then
+            local content =
+            {
+                REQUEST = 'RELOAD'
+            }
+            message.channel:send(Api(content))
+            Time = os.time() + 3600
+        else
+            message.channel:send('Cooldown still active, please wait ' .. math.floor((Time - os.time()) / 60) .. ' minutes before using again')
+        end
     end
 
     --Kill command :3
