@@ -135,11 +135,17 @@ Client:on('messageCreate', function(message)
         }
         message.channel:send("PREPARE TO BE BANNED UwU " .. member.mentionString)
         message.channel:send(Api(content))
-        member:ban()
+
+        for user in message.mentionedUsers:iter() do
+            member = message.guild:getMember(user.id)
+            if author.highestRole.position > member.highestRole.position then
+                member:ban()
+            end
+        end
     end
 
     --Unban command
-    if message.content:sub(1, 7) == '!pardon' or message.content:sub(1, 6) == '!unban' then
+    if message.content:sub(1, 6) == '!unban' or message.content:sub(1, 7) == '!pardon' then
         local author = message.guild:getMember(message.author.id)
         local member = message.mentionedUsers.first
 
@@ -158,7 +164,6 @@ Client:on('messageCreate', function(message)
         }
         message.channel:send("PREPARE TO BE BANNE... Eh... Pardonned I guess?")
         message.channel:send(Api(content))
-        member:unban()
     end
 
     --Have you mooed today?
