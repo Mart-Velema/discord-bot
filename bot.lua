@@ -75,9 +75,18 @@ Client:on('messageCreate', function(message)
     --format - !join service:serviceAccountName
     if message.content:sub(1, 5) == '!join' then
         local service = message.content:sub(6)
-        if not string.find(service, ":") then
-            message.channel:send('Syntax error. To join a service, type `!join <serviceName>:<serviceAccountName>`') return
+        if string.find(service, "!") then
+            message.channel:send(
+                'When you join a service, you agree to have your Discord ID logged on the AeternaServer network.\n' ..
+                'Furthermore, you will agree to have your service username linked to your Discord ID.\n' ..
+                'If you wish to get the logged information, or have it removed, contact an administrator.'
+            ) return
+        elseif not string.find(service, ":") then
+            message.channel:send(
+                'To join a service, type `!join <serviceName>:<serviceAccountName>`\n' ..
+                'For the list of agreements, type `!join !`') return
         end
+
         --substring replacement
         local serviceTable = {}
         for substring in string.gmatch(service, "[^:]+") do
@@ -124,6 +133,7 @@ Client:on('messageCreate', function(message)
             return
         elseif not author:hasPermission("banMembers") then
             message:reply("You do not have the `banMembers` permissions :3")
+            message:reply('https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221')
             return
         end
 
@@ -142,6 +152,7 @@ Client:on('messageCreate', function(message)
                 member:ban()
             end
         end
+        message.channel:send('User banned from discord')
     end
 
     --Unban command
@@ -154,6 +165,7 @@ Client:on('messageCreate', function(message)
             return
         elseif not author:hasPermission("banMembers") then
             message:reply("You do not have the `banMembers` permissions :3")
+            message:reply('https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221')
             return
         end
 
