@@ -84,6 +84,8 @@ Client:on('messageCreate', function(message)
             table.insert(serviceTable, substring)
         end
 
+        print(message.author.id)
+
         local content =
         {
             REQUEST = 'UPDATE_SERVICE',
