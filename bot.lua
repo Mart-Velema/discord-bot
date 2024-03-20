@@ -294,13 +294,20 @@ function Api(content)
     end
 
     local url = Settings['APIURL']
-    local body = Json.encode(content)
+    local payload = Json.encode(content)
     local headers ={{'Content-Type', 'application/json'}}
 
-    local ok, res, body = pcall(Http.request, "POST", url, headers, body, 5000)
+    print('Attempting to make API request')
+    local ok, res, body = pcall(Http.request, "POST", url, headers, payload, 5000)
 
     if not ok or res.code < 200 or res.code >= 300 then
-        print("Failed to connect to api: ".. res.reason) return
+        if res.code then
+            print("Failed to connect to api: ".. res.reason)
+            return 'Failed to connect to API: ' .. res.reason
+        else
+            print("Failed to connect to api: API unavailable")
+            return 'Failed to connect to API: API unavailable'
+        end
     end
 
     local responce = Json.decode(body)
