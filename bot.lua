@@ -63,7 +63,10 @@ CommandTable =
     ['!catpic'] = function(message)
         message.channel:send(GetRandomImage('https://api.thecatapi.com/v1/images/search')[1]['url'])
     end,
-    --Reply with a list of services
+    ----Reply with a radoom guinea pig image when someone says !guineapic
+    ['!guineapic'] = function(message)
+        message.channel:send(GetRandomImage('https://api.infinite-night.com/guineapic/')['image'])
+    end,
     ['!list'] = function(message)
         GetList(message)
     end,
@@ -116,7 +119,7 @@ function GetList(message)
                 message.channel:send(serviceName)
             end
         end
-        message.channel:send("use `!join <service name>:<username of service>` to join a specific service")
+        message.channel:send("use `!join <name of the service>:<your username of that service>` to join a specific service")
     else
         message.channel:send(responce)
     end
@@ -135,7 +138,9 @@ function Join(message)
         ) return
     elseif not string.find(service, ":") then
         message.channel:send(
-            'To join a service, type `!join <serviceName>:<serviceAccountName>`\n' ..
+            'To join a service, type `!join <name of the service>:<your username of that service>`\n' ..
+            '`!join factorio:1_hele_euro\n`' ..
+            'For a list of available services, type `!list`\n' ..
             'For the list of agreements, type `!join !`') return
     end
 
@@ -164,17 +169,18 @@ end
 function Help(message)
     message.channel:send(
         '```Available command:\n' ..
-        '!help: Prints this message. Comming soon: Type !help followed by another command for more details\n' ..
-        '!foxpic: Sends a random photo of a fox\n' ..
-        '!catpic: Sends a random photo of a cat \n' ..
-        '!dogpic: Sends a random photo of a dog\n' ..
-        '!ping: Pong!\n' ..
-        '!ban: Bans a specific user from all services and discord server\n' ..
-        '!unban: Removes all bans of specific user\n' ..
-        '!pardon: Does the same as !unban\n' ..
-        '!reload: Reloads all the bans and whitelists from the database. Can only be used once an hour\n' ..
-        '!list: Prints a list of all the available services\n' ..
-        '!join: Allows you to join any of the available services\n```'
+        '!help      > Prints this message. Comming soon: Type !help followed by another command for more details\n' ..
+        '!foxpic    > Sends a random photo of a fox\n' ..
+        '!catpic    > Sends a random photo of a cat \n' ..
+        '!dogpic    > Sends a random photo of a dog\n' ..
+        '!guineapic > Sends a random photo of a guinea pig\n' ..
+        '!ping      > Pong!\n' ..
+        '!ban       > Bans a specific user from all services and discord server\n' ..
+        '!unban     > Removes all bans of specific user\n' ..
+        '!pardon    > Does the same as !unban\n' ..
+        '!reload    > Reloads all the bans and whitelists from the database. Can only be used once an hour\n' ..
+        '!list      > Prints a list of all the available services\n' ..
+        '!join      > Allows you to join any of the available services\n```'
     )
 end
 
@@ -186,6 +192,7 @@ function Ban(message)
 
     if not member then
         message:reply("Please mention someone to ban :3")
+        message:reply('`!ban @user`')
         return
     elseif not author:hasPermission("banMembers") then
         message:reply("You do not have the `banMembers` permissions :3")
@@ -220,6 +227,7 @@ function Unban(message)
 
     if not member then
         message:reply("Please mention someone to unban :3")
+        message:reply('`!unban @user`')
         return
     elseif not author:hasPermission("banMembers") then
         message:reply("You do not have the `banMembers` permissions :3")
@@ -272,11 +280,15 @@ function GetRandomImage(url)
     if not ok or res.code ~= 200 then
         if res.code then
             print("Failed to connect to animal api: ".. res.reason)
-            return 'Failed to connect to animal API: '.. res.reason
         else
             print('failed to connect to animal api: api unavailable')
-            return 'Failed to connect to animal API: API unavailable'
         end
+        local error =
+        {
+            image = 'Failed to connect to API',
+            message = 'Failed to connect to API'
+        }
+        return error
     end
     return Json.decode(body)
 end
