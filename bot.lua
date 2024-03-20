@@ -270,7 +270,13 @@ end
 function GetRandomImage(url)
     local ok, res, body = pcall(Http.request, "GET", url)
     if not ok or res.code ~= 200 then
-        print("Failed to connect to api: ".. res.reason) return
+        if res.code then
+            print("Failed to connect to animal api: ".. res.reason)
+            return 'Failed to connect to animal API: '.. res.reason
+        else
+            print('failed to connect to animal api: api unavailable')
+            return 'Failed to connect to animal API: API unavailable'
+        end
     end
     return Json.decode(body)
 end
