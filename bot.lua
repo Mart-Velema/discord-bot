@@ -103,6 +103,72 @@ CommandTable =
         Reload(message)
     end
 }
+
+--List of all the descriptions and examples of all the commands
+CommandDescription =
+{
+    --Ping pong!
+    ['ping'] =
+        'The !ping command responds with `pong!`. It does not serve any other purpose\n' ..
+        'Syntax: `!ping`',
+    --Reply with a random fox image when someone says !foxpic
+    ['foxpic'] =
+        'The !foxpic command responds with a random picture of a fox\n' ..
+        'Syntax: `!foxpic`',
+    --Reply with a random dog image when someone says !dogpic
+    ['dogpic'] =
+        'The !dogpic command responds with a random picture of a dog\n' ..
+        'Syntax: `!dogpic`',
+    --Reply with a random cat image when someone says !catpic
+    ['catpic'] =
+        'The !catpic command responds with a random picture of a cat\n' ..
+        'Syntax: `!catpic`',
+    ----Reply with a radoom guinea pig image when someone says !guineapic
+    ['guineapic'] =
+        'The !guineapic command responds with a random picture of a guinea pic\n' ..
+        'Syntax: `!guineapic`',
+    ['list'] =
+        'The !list command responds with a list of available services\n' ..
+        'A service is the name for a server. A server can be any kind of supported game server\n' ..
+        'Syntax: `!list`',
+    --Reply with ToS, or adds user to a service
+    ['join'] =
+        'The !join command allows a user to join any specific service\n' ..
+        'Joining a service, means being added to the whitelist of that service, and getting a corresponding Discord role\n' ..
+        'You are required to join in order to use any of the available services\n' ..
+        'Syntax: `!join !` > prints the service agreements of using the !join command\n' ..
+        'The name of the service is case-insensitive. MineCraft and MINECRAFT are the same service\n' ..
+        'The username of a service, however, IS case-sensitive. 1_HELE_EURO and 1_hele_euro are different usernames\n' ..
+        'Syntax: `!join <service name>:<your username on this service>` > Will join you on a service',
+    --'If you wish to join the service Minecraft with the username HansMans, you would use this command:\n'..
+    --'`!join minecraft:HansMans`'
+    --Reply with a list of available commands and their description/ usage
+    ['help'] =
+        'The !help command responds with a list of available commands and their function\n' ..
+        'Syntax: `!help`' ..
+        'If you wish to get more detailed information about a specific command, you can enter the command after the help command\n' ..
+        'Syntax: `!help <name of the command>` > Prints a command-specific help text',
+    --Ban an user from all services
+    ['ban'] =
+        'The !ban command bans a Discord user from all services and the Discord server\n' ..
+        'To use this command, you are required to have the "BanMembers" privilege\n' ..
+        'Syntax: `!ban @username`',
+    --Unban an user from all services
+    ['unban'] =
+        'The !unban or !pardon command unbans a Discord user from all services and the Discord server\n' ..
+        'To use this command, you are required to have the "BanMembers" privilege\n' ..
+        'Syntax: `!unban @username`',
+    --Have you mooed today?
+    ['moo'] =
+        'Have you mooed today?\n' ..
+        'Syntax: `!moo`',
+    --Reloads the database, rate limited to once an hour
+    ['reload'] =
+        'The !reload command reloads all the whitelists and banlists of all services\n' ..
+        'This is a time-consuming process, which is why it is rate limited to once an hour\n' ..
+        'Syntax: `!reload`',
+}
+
 --Functions that correspond to a Discord command
 --Gets a list of all available services
 --!list
@@ -167,21 +233,36 @@ end
 --!help
 --TODO !help !<commandname>
 function Help(message)
-    message.channel:send(
-        '```Available command:\n' ..
-        '!help      > Prints this message. Comming soon: Type !help followed by another command for more details\n' ..
-        '!foxpic    > Sends a random photo of a fox\n' ..
-        '!catpic    > Sends a random photo of a cat \n' ..
-        '!dogpic    > Sends a random photo of a dog\n' ..
-        '!guineapic > Sends a random photo of a guinea pig\n' ..
-        '!ping      > Pong!\n' ..
-        '!ban       > Bans a specific user from all services and discord server\n' ..
-        '!unban     > Removes all bans of specific user\n' ..
-        '!pardon    > Does the same as !unban\n' ..
-        '!reload    > Reloads all the bans and whitelists from the database. Can only be used once an hour\n' ..
-        '!list      > Prints a list of all the available services\n' ..
-        '!join      > Allows you to join any of the available services\n```'
-    )
+    local helpTable ={}
+    for command in string.gmatch(message.content, "%a+") do
+        table.insert(helpTable, command)
+    end
+
+    if not helpTable[2] then
+        message.channel:send(
+            '```Available command:\n' ..
+            '!help      > Prints this message. Type !help followed by another command for more details\n' ..
+            '!foxpic    > Sends a random photo of a fox\n' ..
+            '!catpic    > Sends a random photo of a cat \n' ..
+            '!dogpic    > Sends a random photo of a dog\n' ..
+            '!guineapic > Sends a random photo of a guinea pig\n' ..
+            '!ping      > Pong!\n' ..
+            '!ban       > Bans a specific user from all services and discord server\n' ..
+            '!unban     > Removes all bans of specific user\n' ..
+            '!pardon    > Does the same as !unban\n' ..
+            '!reload    > Reloads all the bans and whitelists from the database\n' ..
+            '!list      > Prints a list of all the available services\n' ..
+            '!join      > Allows you to join any of the available services\n```'
+        )
+    else
+        local commandFunction = CommandDescription[helpTable[2]]
+
+        if commandFunction then
+            message.channel:send(commandFunction)
+        else
+            message.channel:send('Unknown command')
+        end
+    end
 end
 
 --Bans a user from all services
