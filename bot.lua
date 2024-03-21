@@ -53,9 +53,9 @@ Client:on('messageCreate', function(message)
 
         --Execute the command of the table
         if commandFunction then
+            shortDelay = os.time() + 3
             commandFunction(message)
         end
-        shortDelay = os.time() + 3
     end
 end)
 
@@ -88,6 +88,9 @@ CommandTable =
     --Reply with ToS, or adds user to a service
     ['!join'] = function(message)
         Join(message)
+    end,
+    ['!leave'] = function (message)
+        Leave(message)
     end,
     --Reply with a list of available commands and their description/ usage
     ['!help'] = function (message)
@@ -157,7 +160,12 @@ CommandDescription =
         'Syntax: `!join !` > prints the service agreements of using the !join command\n' ..
         'The name of the service is case-insensitive. MineCraft and MINECRAFT are the same service\n' ..
         'The username of a service, however, IS case-sensitive. 1_HELE_EURO and 1_hele_euro are different usernames\n' ..
-        'Syntax: `!join <service name>:<your username on this service>` > Will join you on a service',
+        'Syntax: `!join <service name>:<your username on this service>` > Will join you on a specified service',
+    --Leave the service and revoke role
+    ['leave'] =
+        'The !leave command allows a user to leave any specific service\n' ..
+        'Leaving a service, means being removed from the whitelist of that service, and revoking the corresponding Discord role\n' ..
+        'Syntax: `!leave <service name>` Will leave you on a specified service',
     --Reply with a list of available commands and their description/ usage
     ['help'] =
         'The !help command responds with a list of available commands and their function\n' ..
@@ -251,7 +259,31 @@ function Join(message)
         author:addRole(roleToAssign)
         message.channel:send('Granting you the role of:' .. serviceTable[1])
     end
+
     message.channel:send('Trying to add ' .. content['ACCOUNT_NAME'] .. ' to the ' .. content['SERVICE'] .. ' service')
+    message.channel:send(Api(content))
+end
+
+function Leave(message)
+    local service = string.lower(message.content:sub(7))
+    local author = message.guild:getMember(message.author.id)
+
+    local content =
+    {
+        REQUEST = 'UPDATE_SERVICE',
+        USER_ID = message.author.id,
+        ACCOUNT_NAME = 'leave',
+        SERVICE = service
+    }
+
+    --Assign a role to the user
+    local roleToRemove = (GuildRoleTable[message.guild.name][string.gsub(service, " ", "")])
+    if roleToRemove then
+        author:removeRole(roleToRemove)
+        message.channel:send('Revoking you the role of:' .. service)
+    end
+
+    message.channel:send('Trying to leave the ' .. content['SERVICE'] .. ' service')
     message.channel:send(Api(content))
 end
 
@@ -282,7 +314,8 @@ function Help(message)
             '!pardon    > Does the same as !unban\n' ..
             '!reload    > Reloads all the bans and whitelists from the database\n' ..
             '!list      > Prints a list of all the available services\n' ..
-            '!join      > Allows you to join any of the available services\n```'
+            '!join      > Allows you to join any of the available services\n' ..
+            '!leave     > Allows you to leave any of the available services```'
         )
     else
         --Store the description from the CommandDescription table
