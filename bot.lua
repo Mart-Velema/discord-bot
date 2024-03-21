@@ -19,23 +19,8 @@ end
 --Print a message saying that the bot is alive
 Client:on('ready', function ()
     print('Logged in as: '  .. Client.user.username)
-    --Creating empty table for roles
-    GuildRoleTable = {}
-
-    --Looping trough a list of servers that the bot is part off
-    for guild in Client.guilds:iter() do
-        GuildRoleTable[guild.name] = {}
-        local roles = Client:getGuild(guild.id).roles
-        --Check if the server even has any roles
-        if roles then
-            --Add the roles to the table one by one, grouped by the server name
-            for roleID, role in pairs(roles) do
-                local roleName = string.lower(role.name)
-                print(roleName, roleID)
-                GuildRoleTable[guild.name][roleName] = roleID
-            end
-        end
-    end
+    --Get the roles of the servers this bot is connected to
+    getRoles()
 
     --Set the activity of the bot
     Client:setActivity({
@@ -394,10 +379,32 @@ function Reload(message)
             REQUEST = 'RELOAD'
         }
         message.channel:send(Api(content))
+        getRoles()
         Time = os.time() + 3600
     else
         --print cooldown message
         message.channel:send('Cooldown still active, please wait ' .. math.floor((Time - os.time()) / 60) .. ' minutes before using again')
+    end
+end
+
+--Discord functions that do not have a command tied to them
+--gets all the roles of all the serers this bot is connected to
+function getRoles()
+    --Creating empty table for roles
+    GuildRoleTable = {}
+    --Looping trough a list of servers that the bot is part off
+    for guild in Client.guilds:iter() do
+        GuildRoleTable[guild.name] = {}
+        local roles = Client:getGuild(guild.id).roles
+        --Check if the server even has any roles
+        if roles then
+            --Add the roles to the table one by one, grouped by the server name
+            for roleID, role in pairs(roles) do
+                local roleName = string.lower(role.name)
+                print(roleName, roleID)
+                GuildRoleTable[guild.name][roleName] = roleID
+            end
+        end
     end
 end
 
