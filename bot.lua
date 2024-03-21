@@ -30,7 +30,8 @@ Client:on('ready', function ()
     })
 
     --Initiate the timer
-    Time = os.time()
+    LongDelay = os.time()
+    shortDelay = os.time()
 end)
 
 --Main loop that will execute the commands
@@ -40,18 +41,21 @@ Client:on('messageCreate', function(message)
         return
     end
 
-    --Decodes the commands based on a space in the message
-    local commands = {}
-    for command in message.content:gmatch("%S+") do
-        table.insert(commands, command)
-    end
+    if shortDelay <= os.time() then
+        --Decodes the commands based on a space in the message
+        local commands = {}
+        for command in message.content:gmatch("%S+") do
+            table.insert(commands, command)
+        end
 
-    --Get the command out of the table
-    local commandFunction = CommandTable[commands[1]]
+        --Get the command out of the table
+        local commandFunction = CommandTable[commands[1]]
 
-    --Execute the command of the table
-    if commandFunction then
-        commandFunction(message)
+        --Execute the command of the table
+        if commandFunction then
+            commandFunction(message)
+        end
+        shortDelay = os.time() + 3
     end
 end)
 
@@ -372,7 +376,7 @@ end
 --!reload
 function Reload(message)
     --Check if the timer has expired or if the user can ban other users
-    if os.time() >= Time  or message.guild:getMember(message.author.id):hasPermission('banMembers') then
+    if os.time() >= LongDelay or message.guild:getMember(message.author.id):hasPermission('banMembers') then
         --execute the reload API call
         local content =
         {
@@ -380,10 +384,10 @@ function Reload(message)
         }
         message.channel:send(Api(content))
         getRoles()
-        Time = os.time() + 3600
+        LongDelay = os.time() + 3600
     else
         --print cooldown message
-        message.channel:send('Cooldown still active, please wait ' .. math.floor((Time - os.time()) / 60) .. ' minutes before using again')
+        message.channel:send('Cooldown still active, please wait ' .. math.floor((LongDelay - os.time()) / 60) .. ' minutes before using again')
     end
 end
 
