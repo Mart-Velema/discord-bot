@@ -116,6 +116,9 @@ CommandTable =
     --Reloads the database, rate limited to once an hour
     ['!reload'] = function (message)
         Reload(message)
+    end,
+    ['!lemons'] = function (message)
+        Lemons(message)
     end
 }
 
@@ -273,6 +276,7 @@ function Help(message)
             '!dogpic    > Sends a random photo of a dog\n' ..
             '!guineapic > Sends a random photo of a guinea pig\n' ..
             '!ping      > Pong!\n' ..
+            '!moo       > Have you mooed today?\n' ..
             '!ban       > Bans a specific user from all services and discord server\n' ..
             '!unban     > Removes all bans of specific user\n' ..
             '!pardon    > Does the same as !unban\n' ..
@@ -391,6 +395,24 @@ function Reload(message)
     end
 end
 
+--Cave Johnson lemon quote Portal 2
+--!lemons
+function Lemons(message)
+    message.channel:send(
+        "Alright, I've been thinking.\n" ..
+        "When life gives you lemons, don't make lemonade - make life take the lemons back!\n" ..
+        "Get mad!\n" ..
+        "I don't want your damn lemons, what am I supposed to do with these?\n" ..
+        "Demand to see life's manager.\n" ..
+        "Make life rue the day it thought it could give Cave Johnson lemons.\n" ..
+        "Do you know who I am?\n" ..
+        "I'm the man who's gonna burn your house down!\n" ..
+        "With the lemons.\n" ..
+        "I'm going to to get my engineers to invent a combustible lemon that burns your house down!\n" ..
+        "― Cave Johnson - Portal 2"
+    )
+end
+
 --Discord functions that do not have a command tied to them
 --gets all the roles of all the serers this bot is connected to
 function getRoles()
@@ -405,7 +427,7 @@ function getRoles()
             --Add the roles to the table one by one, grouped by the server name
             for roleID, role in pairs(roles) do
                 local roleName = string.lower(role.name)
-                print(roleName, roleID)
+                --print(roleName, roleID)
                 GuildRoleTable[guild.name][roleName] = roleID
             end
         end
