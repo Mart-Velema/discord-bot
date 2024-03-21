@@ -18,7 +18,12 @@ end
 
 --Print a message saying that the bot is alive
 Client:on('ready', function ()
-    print('Logged in as' .. Client.user.username)
+    print('Logged in as'  .. Client.user.username)
+    Client:setActivity({
+        name = 'Custom Status',
+        state = 'At your service, with !help',
+        type = 4,
+    })
     Time = os.time()
 end)
 
@@ -140,8 +145,6 @@ CommandDescription =
         'The name of the service is case-insensitive. MineCraft and MINECRAFT are the same service\n' ..
         'The username of a service, however, IS case-sensitive. 1_HELE_EURO and 1_hele_euro are different usernames\n' ..
         'Syntax: `!join <service name>:<your username on this service>` > Will join you on a service',
-    --'If you wish to join the service Minecraft with the username HansMans, you would use this command:\n'..
-    --'`!join minecraft:HansMans`'
     --Reply with a list of available commands and their description/ usage
     ['help'] =
         'The !help command responds with a list of available commands and their function\n' ..
@@ -205,7 +208,6 @@ function Join(message)
     elseif not string.find(service, ":") then
         message.channel:send(
             'To join a service, type `!join <name of the service>:<your username of that service>`\n' ..
-            '`!join factorio:1_hele_euro\n`' ..
             'For a list of available services, type `!list`\n' ..
             'For the list of agreements, type `!join !`') return
     end
@@ -225,13 +227,13 @@ function Join(message)
         ACCOUNT_NAME = serviceTable[2],
         SERVICE = serviceTable[1]
     }
+    --TODO add role to user
     message.channel:send('Trying to add ' .. content['ACCOUNT_NAME'] .. ' to the ' .. content['SERVICE'] .. ' service')
     message.channel:send(Api(content))
 end
 
 --Gets a list of all available commands
 --!help
---TODO !help !<commandname>
 function Help(message)
     local helpTable ={}
     for command in string.gmatch(message.content, "%a+") do
