@@ -18,12 +18,33 @@ end
 
 --Print a message saying that the bot is alive
 Client:on('ready', function ()
-    print('Logged in as'  .. Client.user.username)
+    print('Logged in as: '  .. Client.user.username)
+    --Creating empty table for roles
+    GuildRoleTable = {}
+
+    --Looping trough a list of servers that the bot is part off
+    for guild in Client.guilds:iter() do
+        GuildRoleTable[guild.name] = {}
+        local roles = Client:getGuild(guild.id).roles
+        --Check if the server even has any roles
+        if roles then
+            --Add the roles to the table one by one, grouped by the server name
+            for roleID, role in pairs(roles) do
+                local roleName = string.lower(role.name)
+                print(roleName, roleID)
+                GuildRoleTable[guild.name][roleName] = roleID
+            end
+        end
+    end
+
+    --Set the activity of the bot
     Client:setActivity({
         name = 'Custom Status',
         state = 'At your service, with !help',
         type = 4,
     })
+
+    --Initiate the timer
     Time = os.time()
 end)
 
@@ -181,9 +202,11 @@ function GetList(message)
     {
         REQUEST = 'LIST_SERVICES'
     }
+    --Looping trough all the available services
     local responce = Api(content)
     if type(responce) == 'table' then
         for serviceId, serviceName in ipairs(responce) do
+            --First 4 are admin only, dismiss those
             if  serviceId >= 5 then
                 message.channel:send(serviceName)
             end
@@ -199,6 +222,9 @@ end
 --!join <service Name>:<service Username>; adds the username to the database
 function Join(message)
     local service = message.content:sub(6)
+    local author = message.guild:getMember(message.author.id)
+
+    --Decoding the command that has been send
     if string.find(service, "!") then
         message.channel:send(
             'When you join a service, you agree to have your Discord ID logged on the AeternaServer network.\n' ..
@@ -209,16 +235,15 @@ function Join(message)
         message.channel:send(
             'To join a service, type `!join <name of the service>:<your username of that service>`\n' ..
             'For a list of available services, type `!list`\n' ..
-            'For the list of agreements, type `!join !`') return
+            'For the list of agreements, type `!join !`'
+        ) return
     end
 
     --substring replacement
     local serviceTable = {}
     for substring in string.gmatch(service, "[^:]+") do
-        table.insert(serviceTable, substring)
+        table.insert(serviceTable, string.lower(substring))
     end
-
-    print(message.author.id)
 
     local content =
     {
@@ -227,7 +252,13 @@ function Join(message)
         ACCOUNT_NAME = serviceTable[2],
         SERVICE = serviceTable[1]
     }
-    --TODO add role to user
+
+    --Assign a role to the user
+    local roleToAssign = (GuildRoleTable[message.guild.name][string.gsub(serviceTable[1], " ", "")])
+    if roleToAssign then
+        author:addRole(roleToAssign)
+        message.channel:send('Granting you the role of:' .. serviceTable[1])
+    end
     message.channel:send('Trying to add ' .. content['ACCOUNT_NAME'] .. ' to the ' .. content['SERVICE'] .. ' service')
     message.channel:send(Api(content))
 end
@@ -235,11 +266,15 @@ end
 --Gets a list of all available commands
 --!help
 function Help(message)
+
+    --Initiate the helpTable table
     local helpTable ={}
+    --Fill it with the arguments supplied to the !help command
     for command in string.gmatch(message.content, "%a+") do
         table.insert(helpTable, command)
     end
 
+    --If it can't find any argument, print the general purpose help command
     if not helpTable[2] then
         message.channel:send(
             '```Available command:\n' ..
@@ -257,8 +292,9 @@ function Help(message)
             '!join      > Allows you to join any of the available services\n```'
         )
     else
+        --Store the description from the CommandDescription table
         local commandFunction = CommandDescription[helpTable[2]]
-
+        --If it can find the command, print it. Else, return error
         if commandFunction then
             message.channel:send(commandFunction)
         else
@@ -273,10 +309,12 @@ function Ban(message)
     local author = message.guild:getMember(message.author.id)
     local member = message.mentionedUsers.first
 
+    --Check if the command pings a user
     if not member then
         message:reply("Please mention someone to ban :3")
         message:reply('`!ban @user`')
         return
+    --Check if the author can ban members
     elseif not author:hasPermission("banMembers") then
         message:reply("You do not have the `banMembers` permissions :3")
         message:reply('https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221')
@@ -292,8 +330,10 @@ function Ban(message)
     message.channel:send("PREPARE TO BE BANNED UwU " .. member.mentionString)
     message.channel:send(Api(content))
 
+    --Ban the user from the server
     for user in message.mentionedUsers:iter() do
         member = message.guild:getMember(user.id)
+        --Check if the user has a lower role position than the user that executed the commadn
         if author.highestRole.position > member.highestRole.position then
             member:ban()
         end
@@ -308,10 +348,12 @@ function Unban(message)
     local author = message.guild:getMember(message.author.id)
     local member = message.mentionedUsers.first
 
+    --Check if the command pings a user
     if not member then
         message:reply("Please mention someone to unban :3")
         message:reply('`!unban @user`')
         return
+    --Check if the author can ban members
     elseif not author:hasPermission("banMembers") then
         message:reply("You do not have the `banMembers` permissions :3")
         message:reply('https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221')
@@ -344,7 +386,9 @@ end
 --rate limited to once an hour, can be overwritten by administrators
 --!reload
 function Reload(message)
+    --Check if the timer has expired or if the user can ban other users
     if os.time() >= Time  or message.guild:getMember(message.author.id):hasPermission('banMembers') then
+        --execute the reload API call
         local content =
         {
             REQUEST = 'RELOAD'
@@ -352,6 +396,7 @@ function Reload(message)
         message.channel:send(Api(content))
         Time = os.time() + 3600
     else
+        --print cooldown message
         message.channel:send('Cooldown still active, please wait ' .. math.floor((Time - os.time()) / 60) .. ' minutes before using again')
     end
 end
@@ -379,7 +424,7 @@ end
 --Function to dump an array/ table
 function Dump(o)
     if type(o) == 'table' then
-        for i,v in ipairs(o) do
+        for i,v in pairs(o) do
             print(i, v)
         end
     end
