@@ -34,6 +34,10 @@ Client:on('ready', function ()
     shortDelay = os.time()
 end)
 
+Client:on('guildCreate', function()
+    getRoles()
+end)
+
 --Main loop that will execute the commands
 Client:on('messageCreate', function(message)
     --Detect if message is form a bot, don't do anything else if so
@@ -458,6 +462,7 @@ function getRoles()
     --Looping trough a list of servers that the bot is part off
     for guild in Client.guilds:iter() do
         GuildRoleTable[guild.name] = {}
+        --print(guild.name)
         local roles = Client:getGuild(guild.id).roles
         --Check if the server even has any roles
         if roles then
