@@ -342,14 +342,14 @@ function Ban(message)
 
     --Check if the command pings a user
     if not member then
-        message:reply("Please mention someone to ban :3")
-        message:reply('`!ban @user`')
-        return
+        message:reply(
+            'Please mention someone to ban :3\n' ..
+            '`!ban @user`') return
     --Check if the author can ban members
     elseif not author:hasPermission("banMembers") then
-        message:reply("You do not have the `banMembers` permissions :3")
-        message:reply('https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221')
-        return
+        message:reply(
+            'You do not have the `banMembers` permissions :3\n' ..
+            'https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221') return
     end
 
     local content=
@@ -384,14 +384,14 @@ function Unban(message)
 
     --Check if the command pings a user
     if not member then
-        message:reply("Please mention someone to unban :3")
-        message:reply('`!unban @user`')
-        return
+        message:reply(
+            'Please mention someone to unban :3\n' ..
+            '`!ban @user`') return
     --Check if the author can ban members
     elseif not author:hasPermission("banMembers") then
-        message:reply("You do not have the `banMembers` permissions :3")
-        message:reply('https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221')
-        return
+        message:reply(
+            'You do not have the `banMembers` permissions :3\n' ..
+            'https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221') return
     end
 
     local content=
