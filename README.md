@@ -31,5 +31,5 @@ git clone https://github.com/Mart-Velema/discord-bot.git
 
 Tweak the contents of the bot.lua to your likings. Once you're done, run the bot by:
 ```
-luvit bot/bot.lua
+luvit discord-bot/bot.lua
 ```

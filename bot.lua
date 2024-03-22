@@ -41,6 +41,7 @@ Client:on('messageCreate', function(message)
         return
     end
 
+    --TODO fix time exploit
     if shortDelay <= os.time() then
         --Decodes the commands based on a space in the message
         local commands = {}
@@ -353,18 +354,21 @@ function Ban(message)
         USER_ID = member.id,
         REASON = 'You have been banned by an administrator'
     }
-    message.channel:send("PREPARE TO BE BANNED UwU " .. member.mentionString)
-    message.channel:send(Api(content))
+    message.channel:send("Preparing to ban the user: " .. member.mentionString)
 
     --Ban the user from the server
     for user in message.mentionedUsers:iter() do
         member = message.guild:getMember(user.id)
         --Check if the user has a lower role position than the user that executed the commadn
         if author.highestRole.position > member.highestRole.position then
+            message.channel:send(Api(content))
             member:ban()
+            message.channel:send('User banned from discord')
+            return
+        else
+            message.channel:send('The user you are trying to ban has a higher role than you have')
         end
     end
-    message.channel:send('User banned from discord')
 end
 
 --Unbans a user from all services, does not unban from Discord
