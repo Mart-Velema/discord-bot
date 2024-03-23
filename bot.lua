@@ -208,9 +208,9 @@ function GetList(message)
         REQUEST = 'LIST_SERVICES'
     }
     --Looping trough all the available services
-    local responce = Api(content)
-    if type(responce) == 'table' then
-        for serviceId, serviceName in ipairs(responce) do
+    local response = Api(content)
+    if type(response) == 'table' then
+        for serviceId, serviceName in ipairs(response) do
             --First 4 are admin only, dismiss those
             if  serviceId >= 5 then
                 message.channel:send(serviceName)
@@ -218,7 +218,7 @@ function GetList(message)
         end
         message.channel:send("use `!join <name of the service>:<your username of that service>` to join a specific service")
     else
-        message.channel:send(responce)
+        message.channel:send(response)
     end
 end
 
@@ -363,7 +363,7 @@ function Ban(message)
     --Ban the user from the server
     for user in message.mentionedUsers:iter() do
         member = message.guild:getMember(user.id)
-        --Check if the user has a lower role position than the user that executed the commadn
+        --Check if the user has a lower role position than the user that executed the command
         if author.highestRole.position > member.highestRole.position then
             message.channel:send(Api(content))
             member:ban()
@@ -399,7 +399,7 @@ function Unban(message)
         REQUEST = 'UNBAN',
         USER_ID = member.id,
     }
-    message.channel:send("PREPARE TO BE BANNE... Eh... Pardonned I guess?")
+    message.channel:send("Preparing to unban the user: " .. member.mentionString)
     message.channel:send(Api(content))
 end
 
@@ -455,7 +455,7 @@ function Lemons(message)
 end
 
 --Discord functions that do not have a command tied to them
---gets all the roles of all the serers this bot is connected to
+--gets all the roles of all the servers this bot is connected to
 function getRoles()
     --Creating empty table for roles
     GuildRoleTable = {}
@@ -531,9 +531,9 @@ function Api(content)
         end
     end
 
-    local responce = Json.decode(body)
-    if type(responce) == 'table' then
-        return responce['responce']
+    local response = Json.decode(body)
+    if type(response) == 'table' then
+        return response[response]
     else
         print('HTTP output: ' .. body)
         return 'Server unreachable, please contact administrator ERROR 2'
