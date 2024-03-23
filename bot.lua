@@ -28,10 +28,6 @@ Client:on('ready', function ()
         state = 'At your service, with !help',
         type = 4,
     })
-
-    --Initiate the timer
-    LongDelay = os.time()
-    shortDelay = os.time()
 end)
 
 Client:on('guildCreate', function()
@@ -45,8 +41,7 @@ Client:on('messageCreate', function(message)
         return
     end
 
-    --TODO fix time exploit
-    if shortDelay <= os.time() then
+    if GuildRoleTable[message.guild.name]['shortDelay'] <= os.time() then
         --Decodes the commands based on a space in the message
         local commands = {}
         for command in message.content:gmatch("%S+") do
@@ -58,7 +53,7 @@ Client:on('messageCreate', function(message)
 
         --Execute the command of the table
         if commandFunction then
-            shortDelay = os.time() + 3
+            GuildRoleTable[message.guild.name]['shortDelay'] = os.time() + 5
             commandFunction(message)
         end
     end
@@ -421,7 +416,7 @@ end
 --!reload
 function Reload(message)
     --Check if the timer has expired or if the user can ban other users
-    if os.time() >= LongDelay or message.guild:getMember(message.author.id):hasPermission('banMembers') then
+    if os.time() >= GuildRoleTable[message.guild.name]['longDelay'] or message.guild:getMember(message.author.id):hasPermission('banMembers') then
         --execute the reload API call
         local content =
         {
@@ -429,10 +424,10 @@ function Reload(message)
         }
         message.channel:send(Api(content))
         getRoles()
-        LongDelay = os.time() + 3600
+        GuildRoleTable[message.guild.name]['longDelay']  = os.time() + 3600
     else
         --print cooldown message
-        message.channel:send('Cooldown still active, please wait ' .. math.floor((LongDelay - os.time()) / 60) .. ' minutes before using again')
+        message.channel:send('Cooldown still active, please wait ' .. math.floor((GuildRoleTable[message.guild.name]['longDelay'] - os.time()) / 60) .. ' minutes before using again')
     end
 end
 
@@ -461,7 +456,11 @@ function getRoles()
     GuildRoleTable = {}
     --Looping trough a list of servers that the bot is part off
     for guild in Client.guilds:iter() do
-        GuildRoleTable[guild.name] = {}
+        GuildRoleTable[guild.name] =
+        {
+            longDelay = os.time(),
+            shortDelay = os.time()
+        }
         --print(guild.name)
         local roles = Client:getGuild(guild.id).roles
         --Check if the server even has any roles
