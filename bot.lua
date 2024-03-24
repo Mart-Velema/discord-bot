@@ -122,6 +122,9 @@ CommandTable =
     end,
     ['!lemons'] = function (message)
         Lemons(message)
+    end,
+    ['!credits'] = function (message)
+        message.channel:send('This bot is made by the guinea pig obsesses 1_hele_euro :3')
     end
 }
 
