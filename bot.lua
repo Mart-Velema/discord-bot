@@ -535,7 +535,7 @@ function Api(content)
 
     local response = Json.decode(body)
     if type(response) == 'table' then
-        return response[response]
+        return response["response"]
     else
         print('HTTP output: ' .. body)
         return 'Server unreachable, please contact administrator ERROR 2'
