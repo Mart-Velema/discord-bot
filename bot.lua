@@ -126,9 +126,11 @@ CommandTable =
     ['!reload'] = function (message)
         Reload(message)
     end,
+    --When life gives you lemons
     ['!lemons'] = function (message)
         Lemons(message)
     end,
+    --Returns a short crediting message
     ['!credits'] = function (message)
         message.channel:send('This bot is made by the guinea pig obsesses 1_hele_euro :3')
     end
@@ -157,15 +159,15 @@ CommandDescription =
     ['guineapic'] =
         'The !guineapic command responds with a random picture of a guinea pic\n' ..
         'Syntax: `!guineapic`',
-    --Reply with the status of a specified service
-    ['status'] =
-        'The status command returns the status of a specified service\n' ..
-        'Syntax: `!status <name of service>`',
     --Reply with a list of available services
     ['list'] =
         'The !list command responds with a list of available services\n' ..
         'A service is the name for a server. A server can be any kind of supported game server\n' ..
         'Syntax: `!list`',
+    --Reply with the status of a specified service
+    ['status'] =
+    'The status command returns the status of a specified service\n' ..
+            'Syntax: `!status <name of service>`',
     --Reply with ToS, or adds user to a service
     ['join'] =
         'The !join command allows a user to join any specific service\n' ..
@@ -200,11 +202,23 @@ CommandDescription =
     ['moo'] =
         'Have you mooed today?\n' ..
         'Syntax: `!moo`',
+    --Have you mooed today?
+    ['cow'] =
+        'Have you mooed today?\n' ..
+        'Syntax: `!cow`',
     --Reloads the database, rate limited to once an hour
     ['reload'] =
         'The !reload command reloads all the whitelists and banlists of all services\n' ..
         'This is a time-consuming process, which is why it is rate limited to once an hour\n' ..
         'Syntax: `!reload`',
+    --When life gives you lemons
+    ['lemons'] =
+        'When life gives you lemons, make lemonade\n' ..
+        'Syntax: `!lemons',
+    --Returns a short crediting message
+    ['credits'] =
+        'The !credits command prints a simple message crediting the people who have helped making the server\n' ..
+        'Syntax: `!credits',
 }
 
 --Functions that correspond to a Discord command
@@ -334,6 +348,7 @@ function Help(message)
             '!pardon    > Does the same as !unban\n' ..
             '!reload    > Reloads all the bans and whitelists from the database\n' ..
             '!list      > Prints a list of all the available services\n' ..
+            '!status    > Prints the status of the requested service \n' ..
             '!join      > Allows you to join any of the available services\n' ..
             '!leave     > Allows you to leave any of the available services```'
         )
