@@ -248,7 +248,14 @@ end
 --Gets the status of a specific service
 --!service <name of service>
 function GetStatus(message)
-    message.channel:send('hello, World!');
+    local service = message.content:sub(9)
+    print(service)
+    local content =
+    {
+        REQUEST = 'STATUS_SERVICE',
+        SERVICE = service
+    }
+    message.channel:send(Api(content))
 end
 
 --Allows the user to join a service or list the agreement of using the services
