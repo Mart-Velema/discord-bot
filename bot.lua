@@ -78,17 +78,23 @@ CommandTable =
     ['!catpic'] = function(message)
         message.channel:send(GetRandomImage('https://api.thecatapi.com/v1/images/search')[1]['url'])
     end,
-    ----Reply with a radoom guinea pig image when someone says !guineapic
+    ---Reply with a radoom guinea pig image when someone says !guineapic
     ['!guineapic'] = function(message)
         message.channel:send(GetRandomImage('https://api.infinite-night.com/guineapic/')['image'])
     end,
+    --Reply with a list of available services
     ['!list'] = function(message)
         GetList(message)
+    end,
+    --Reply with the status of a specified available services
+    ['!status'] = function(message)
+        GetStatus(message)
     end,
     --Reply with ToS, or adds user to a service
     ['!join'] = function(message)
         Join(message)
     end,
+    --Reply with a leave message and leaves a user from a service
     ['!leave'] = function (message)
         Leave(message)
     end,
@@ -147,10 +153,15 @@ CommandDescription =
     ['catpic'] =
         'The !catpic command responds with a random picture of a cat\n' ..
         'Syntax: `!catpic`',
-    ----Reply with a radoom guinea pig image when someone says !guineapic
+    --Reply with a radoom guinea pig image when someone says !guineapic
     ['guineapic'] =
         'The !guineapic command responds with a random picture of a guinea pic\n' ..
         'Syntax: `!guineapic`',
+    --Reply with the status of a specified service
+    ['status'] =
+        'The status command returns the status of a specified service\n' ..
+        'Syntax: `!status <name of service>`',
+    --Reply with a list of available services
     ['list'] =
         'The !list command responds with a list of available services\n' ..
         'A service is the name for a server. A server can be any kind of supported game server\n' ..
@@ -218,6 +229,12 @@ function GetList(message)
     else
         message.channel:send(response)
     end
+end
+
+--Gets the status of a specific service
+--!service <name of service>
+function GetStatus(message)
+    message.channel:send('hello, World!');
 end
 
 --Allows the user to join a service or list the agreement of using the services
@@ -342,12 +359,14 @@ function Ban(message)
     if not member then
         message:reply(
             'Please mention someone to ban :3\n' ..
-            '`!ban @user`') return
+            '`!ban @user`'
+        ) return
     --Check if the author can ban members
     elseif not author:hasPermission("banMembers") then
         message:reply(
             'You do not have the `banMembers` permissions :3\n' ..
-            'https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221') return
+            'https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221'
+        ) return
     end
 
     local content=
@@ -384,12 +403,14 @@ function Unban(message)
     if not member then
         message:reply(
             'Please mention someone to unban :3\n' ..
-            '`!ban @user`') return
+            '`!ban @user`'
+        ) return
     --Check if the author can ban members
     elseif not author:hasPermission("banMembers") then
         message:reply(
             'You do not have the `banMembers` permissions :3\n' ..
-            'https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221') return
+            'https://tenor.com/view/demoman-heavy-scout-medic-tf2-gif-19939221'
+        ) return
     end
 
     local content=
