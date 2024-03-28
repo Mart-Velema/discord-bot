@@ -114,6 +114,10 @@ CommandTable =
     ['!pardon'] = function(message)
         Unban(message)
     end,
+    --Reloads the database, rate limited to once an hour
+    ['!reload'] = function (message)
+        Reload(message)
+    end,
     --Have you mooed today?
     ['!moo'] = function(message)
         Cow(message)
@@ -122,17 +126,9 @@ CommandTable =
     ['!cow'] = function(message)
         Cow(message)
     end,
-    --Reloads the database, rate limited to once an hour
-    ['!reload'] = function (message)
-        Reload(message)
-    end,
     --When life gives you lemons
     ['!lemons'] = function (message)
         Lemons(message)
-    end,
-    --Returns a short crediting message
-    ['!credits'] = function (message)
-        message.channel:send('This bot is made by the guinea pig obsesses 1_hele_euro :3')
     end
 }
 
@@ -199,6 +195,11 @@ CommandDescription =
         'To use this command, you are required to have the "BanMembers" privilege\n' ..
         'Syntax: `!unban @username`',
     --Have you mooed today?
+    --Reloads the database, rate limited to once an hour
+    ['reload'] =
+        'The !reload command reloads all the whitelists and banlists of all services\n' ..
+        'This is a time-consuming process, which is why it is rate limited to once an hour\n' ..
+        'Syntax: `!reload`',
     ['moo'] =
         'Have you mooed today?\n' ..
         'Syntax: `!moo`',
@@ -206,19 +207,10 @@ CommandDescription =
     ['cow'] =
         'Have you mooed today?\n' ..
         'Syntax: `!cow`',
-    --Reloads the database, rate limited to once an hour
-    ['reload'] =
-        'The !reload command reloads all the whitelists and banlists of all services\n' ..
-        'This is a time-consuming process, which is why it is rate limited to once an hour\n' ..
-        'Syntax: `!reload`',
     --When life gives you lemons
     ['lemons'] =
         'When life gives you lemons, make lemonade\n' ..
         'Syntax: `!lemons',
-    --Returns a short crediting message
-    ['credits'] =
-        'The !credits command prints a simple message crediting the people who have helped making the server\n' ..
-        'Syntax: `!credits',
 }
 
 --Functions that correspond to a Discord command
@@ -349,7 +341,6 @@ function Help(message)
             '!dogpic    > Sends a random photo of a dog\n' ..
             '!guineapic > Sends a random photo of a guinea pig\n' ..
             '!ping      > Pong!\n' ..
-            '!moo       > Have you mooed today?\n' ..
             '!ban       > Bans a specific user from all services and discord server\n' ..
             '!unban     > Removes all bans of specific user\n' ..
             '!pardon    > Does the same as !unban\n' ..
@@ -444,19 +435,6 @@ function Unban(message)
     message.channel:send(Api(content))
 end
 
---Have you mooed today?
-function Cow(message)
-    message.channel:send(
-        '```                   (__)        \n' ..
-        '                   (oo)        \n' ..
-        '             /------\\/         \n' ..
-        '           / |    ||           \n' ..
-        '          *  /\\---/\\           \n' ..
-        '             ~~   ~~           \n' ..
-        '..."Have you mooed today?"...  ```'
-    )
-end
-
 --Reloads all the bans/ whitelists of the entire database
 --rate limited to once an hour, can be overwritten by administrators
 --!reload
@@ -475,6 +453,19 @@ function Reload(message)
         --print cooldown message
         message.channel:send('Cooldown still active, please wait ' .. math.floor((GuildRoleTable[message.guild.name]['longDelay'] - os.time()) / 60) .. ' minutes before using again')
     end
+end
+
+--Have you mooed today?
+function Cow(message)
+    message.channel:send(
+        '```                   (__)        \n' ..
+        '                   (oo)        \n' ..
+        '             /------\\/         \n' ..
+        '           / |    ||           \n' ..
+        '          *  /\\---/\\           \n' ..
+        '             ~~   ~~           \n' ..
+        '..."Have you mooed today?"...  ```'
+    )
 end
 
 --Cave Johnson lemon quote Portal 2
@@ -540,15 +531,6 @@ function GetRandomImage(url)
     end
     return Json.decode(body)
 end
-
---Function to dump an array/ table
-function Dump(o)
-    if type(o) == 'table' then
-        for i,v in pairs(o) do
-            print(i, v)
-        end
-    end
- end
 
 --Function to handle API calls
 function Api(content)
