@@ -534,7 +534,7 @@ end
 
 --Function to handle API calls
 function Api(content)
-    if not type(content) == 'table' then
+    if type(content) ~= 'table' then
         print("Input must be type of table, something else has been supplied")
         return "Syntax error, please contact administrator"
     else
@@ -557,10 +557,19 @@ function Api(content)
             return 'Failed to connect to API: API unavailable'
         end
     end
-
+    print(body)
     local response = Json.decode(body)
     if type(response) == 'table' then
-        return response["response"]
+        if response['token'] then
+            Settings['PASSWD'] = response['token']
+            local settings = Json.encode(Settings)
+            local file = io.open("discord-bot/settings.json", "w")
+            file:write(settings)
+            file:close()
+            return response["response"]
+        else
+            return 'Resived impossible request, please contact administrator'
+        end
     else
         print('HTTP output: ' .. body)
         return 'Server unreachable, please contact administrator ERROR 2'
