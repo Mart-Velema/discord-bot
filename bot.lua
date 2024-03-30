@@ -6,14 +6,24 @@ Http = require('coro-http')
 Client = Discordia.Client()
 
 --Read the .json settings
-local file = io.open("discord-bot/settings.json", "r")
-if file then
-    local content = file:read("*a")
-    file:close()
+local settingsFile = io.open("discord-bot/settings.json", "r")
+if settingsFile then
+    local content = settingsFile:read("*a")
+    settingsFile:close()
     Settings = Json.decode(content)
 else
     print("Failed to find settings file, shutdown")
     os.exit()
+end
+
+--Read the manpage file
+local manpagesFile = io.open("discord-bot/manpages.json", "r")
+if manpagesFile then
+    local content = manpagesFile:read("*a")
+    manpagesFile:close()
+    Manpages = Json.decode(content)
+else
+    print("Failed to find manpages")
 end
 
 --Print a message saying that the bot is alive
@@ -384,6 +394,9 @@ end
 --Prints the manpage of a specified command
 --!man or !manpage
 function Man(message)
+    if not Manpages then
+        message.channel:send("Could not find manpages") return
+    end
     message.channel:send("Hello, World!")
 end
 
