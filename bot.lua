@@ -595,7 +595,7 @@ function Api(content)
             return 'Failed to connect to API: API unavailable'
         end
     end
-    print(body)
+
     local response = Json.decode(body)
     if type(response) == 'table' then
         if response['token'] then
