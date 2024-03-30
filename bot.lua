@@ -102,6 +102,14 @@ CommandTable =
     ['!help'] = function (message)
         Help(message)
     end,
+    --Reply with a man entry for specified command
+    ['!man'] = function (message)
+        Man(message)
+    end,
+    --Also Reply with a man entry for specified command
+    ['!manpage'] = function (message)
+        Man(message)
+    end,
     --Ban an user from all services
     ['!ban'] = function(message)
         Ban(message)
@@ -184,6 +192,16 @@ CommandDescription =
         'Syntax: `!help`' ..
         'If you wish to get more detailed information about a specific command, you can enter the command after the help command\n' ..
         'Syntax: `!help <name of the command>` > Prints a command-specific help text',
+    --Reply with a man entry for specified command
+    ['man'] =
+        'The !man command responds with an entry of the manpages for a specified command\n' ..
+        'Manpages contain more information on the usage of a command than a standard `!help` command has\n' ..
+        'Syntax: `!man <name of the command>`',
+    --Reply with a man entry for specified command
+    ['manpage'] =
+        'The !manpage command responds with an entry of the manpages for a specified command\n' ..
+        'Manpages contain more information on the usage of a command than a standard `!help` command has\n' ..
+        'Syntax: `!manpage <name of the command>`',
     --Ban an user from all services
     ['ban'] =
         'The !ban command bans a Discord user from all services and the Discord server\n' ..
@@ -348,7 +366,8 @@ function Help(message)
             '!list      > Prints a list of all the available services\n' ..
             '!status    > Prints the status of the requested service \n' ..
             '!join      > Allows you to join any of the available services\n' ..
-            '!leave     > Allows you to leave any of the available services```'
+            '!leave     > Allows you to leave any of the available services\n' ..
+            '!man       > Prints the manpage entry of a specified command```'
         )
     else
         --Store the description from the CommandDescription table
@@ -360,6 +379,12 @@ function Help(message)
             message.channel:send('Unknown command')
         end
     end
+end
+
+--Prints the manpage of a specified command
+--!man or !manpage
+function Man(message)
+    message.channel:send("Hello, World!")
 end
 
 --Bans a user from all services
