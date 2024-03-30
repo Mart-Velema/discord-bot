@@ -569,7 +569,8 @@ function Api(content)
             file:close()
             return response["response"]
         else
-            return 'Resived impossible request, please contact administrator'
+            print(response['response'])
+            return 'Resived impossible request, please contact administrator' .. response['response']
         end
     else
         print('HTTP output: ' .. body)
