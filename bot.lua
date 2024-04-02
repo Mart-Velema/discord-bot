@@ -23,11 +23,12 @@ Client:on('ready', function ()
     getRoles()
 
     --Set the activity of the bot
-    Client:setActivity({
+    Client:setActivity
+    {
         name = 'Custom Status',
         state = 'At your service, with !help',
         type = 4,
-    })
+    }
 end)
 
 Client:on('guildCreate', function()
@@ -151,7 +152,7 @@ CommandDescription =
     ['catpic'] =
         'The !catpic command responds with a random picture of a cat\n' ..
         'Syntax: `!catpic`',
-    --Reply with a radoom guinea pig image when someone says !guineapic
+    --Reply with a random guinea pig image when someone says !guineapic
     ['guineapic'] =
         'The !guineapic command responds with a random picture of a guinea pic\n' ..
         'Syntax: `!guineapic`',
@@ -241,7 +242,6 @@ end
 --!service <name of service>
 function GetStatus(message)
     local service = message.content:sub(9)
-    print(service)
     local content =
     {
         REQUEST = 'STATUS_SERVICE',
@@ -290,7 +290,7 @@ function Join(message)
     local roleToAssign = (GuildRoleTable[message.guild.name][string.gsub(serviceTable[1], " ", "")])
     if roleToAssign then
         author:addRole(roleToAssign)
-        message.channel:send('Granting you the role of:' .. serviceTable[1])
+        message.channel:send('Granting you the role of: ' .. serviceTable[1])
     end
 
     message.channel:send('Trying to add ' .. content['ACCOUNT_NAME'] .. ' to the ' .. content['SERVICE'] .. ' service')
@@ -350,7 +350,7 @@ function Help(message)
             '!join      > Allows you to join any of the available services\n' ..
             '!leave     > Allows you to leave any of the available services\n' ..
             '!man       > Prints the manpage entry of a specified command```'
-        )
+        ) return
     else
         --Store the description from the CommandDescription table
         local commandFunction = CommandDescription[helpTable[2]]
@@ -452,7 +452,11 @@ function Reload(message)
         GuildRoleTable[message.guild.name]['longDelay']  = os.time() + 3600
     else
         --print cooldown message
-        message.channel:send('Cooldown still active, please wait ' .. math.floor((GuildRoleTable[message.guild.name]['longDelay'] - os.time()) / 60) .. ' minutes before using again')
+        message.channel:send(
+            'Cooldown still active, please wait ' ..
+            math.floor((GuildRoleTable[message.guild.name]['longDelay'] - os.time()) / 60) ..
+            ' minutes before using again'
+        ) return
     end
 end
 
@@ -518,16 +522,20 @@ end
 function GetRandomImage(url)
     local ok, res, body = pcall(Http.request, "GET", url)
     if not ok or res.code ~= 200 then
+        local error
         if res.code then
-            print("Failed to connect to animal api: ".. res.reason)
+            error =
+            {
+                image = 'Failed to connect to API: ' .. res.code,
+                message = 'Failed to connect to API: ' .. res.code
+            }
         else
-            print('failed to connect to animal api: api unavailable')
+            error =
+            {
+                image = 'Failed to connect to API: API available',
+                message = 'Failed to connect to API: API unavailable'
+            }
         end
-        local error =
-        {
-            image = 'Failed to connect to API',
-            message = 'Failed to connect to API'
-        }
         return error
     end
     return Json.decode(body)
@@ -544,7 +552,10 @@ function Api(content)
 
     local url = Settings['APIURL']
     local payload = Json.encode(content)
-    local headers ={{'Content-Type', 'application/json'}}
+    local headers =
+    {
+        'Content-Type', 'application/json'
+    }
 
     print('Attempting to make API request')
     local ok, res, body = pcall(Http.request, "POST", url, headers, payload, 5000)
@@ -570,7 +581,7 @@ function Api(content)
             return response["response"]
         else
             print(response['response'])
-            return 'Resived impossible request, please contact administrator' .. response['response']
+            return 'received impossible request, please contact administrator: ' .. response['response']
         end
     else
         print('HTTP output: ' .. body)
