@@ -35,6 +35,19 @@ Client:on('guildCreate', function()
     getRoles()
 end)
 
+Client:on('roleCreate', function(role)
+    GuildRoleTable[role.guild.name][role.name] = role
+end)
+
+Client:on('roleUpdate', function(role)
+    for k,v in pairs(role) do
+        if v == role then
+            GuildRoleTable[role.guild.name][k] = nil
+        end
+    end
+    GuildRoleTable[role.guild.name][role.name] = role
+end)
+
 --Main loop that will execute the commands
 Client:on('messageCreate', function(message)
     --Detect if message is form a bot, don't do anything else if so
@@ -448,7 +461,6 @@ function Reload(message)
             REQUEST = 'RELOAD'
         }
         message.channel:send(Api(content))
-        getRoles()
         GuildRoleTable[message.guild.name]['longDelay']  = os.time() + 3600
     else
         --print cooldown message
