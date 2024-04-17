@@ -260,7 +260,15 @@ function GetStatus(message)
         REQUEST = 'STATUS_SERVICE',
         SERVICE = service
     }
-    message.channel:send(Api(content))
+    local status = Api(content)
+    if status == true then
+        status = 'Online'
+    elseif status == false then
+        status = 'Offline'
+    else
+        message.channel:send(status) return
+    end
+        message.channel:send('Service ' .. service .. ' is currently ' .. status   )
 end
 
 --Allows the user to join a service or list the agreement of using the services
@@ -566,7 +574,7 @@ function Api(content)
     local payload = Json.encode(content)
     local headers =
     {
-        'Content-Type', 'application/json'
+        ['Content-Type'] = 'application/json'
     }
 
     print('Attempting to make API request')
@@ -574,10 +582,12 @@ function Api(content)
 
     if not ok or res.code < 200 or res.code >= 300 then
         if res.code then
+            --If OK
             print("Failed to connect to api: ".. res.reason)
             return 'Failed to connect to API: ' .. res.reason
         else
-            print("Failed to connect to api: API unavailable")
+            --If not OK
+            print("Failed to connect to api: API unavailable | " .. res)
             return 'Failed to connect to API: API unavailable'
         end
     end
