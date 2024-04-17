@@ -17,11 +17,11 @@ Make sure to enter the directory where you isntalled Luvit to before continiuein
 
 Discordia:
 ```
-lit install SinisterRectus/discordia
+./lit install SinisterRectus/discordia
 ```
 coro-http:
 ```
-lit install creationix/coro-http
+./lit install creationix/coro-http
 ```
 
 Then clone this repo into the same directory
@@ -31,5 +31,5 @@ git clone https://github.com/Mart-Velema/discord-bot.git
 
 Tweak the contents of the bot.lua to your likings. Once you're done, run the bot by:
 ```
-luvit discord-bot/bot.lua
+./luvit discord-bot/bot.lua
 ```
