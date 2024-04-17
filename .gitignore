@@ -1,4 +1,5 @@
 settings.json
 *.db
 !format.db
+story.json
 .idea

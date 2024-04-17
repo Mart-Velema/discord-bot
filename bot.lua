@@ -6,15 +6,43 @@ Http = require('coro-http')
 SQLite = require('sqlite3')
 Client = Discordia.Client()
 
+--Checking if a file exist
+function FileExist(filepath)
+    local file = io.open(filepath, 'r')
+    if file then
+        file:close()
+        return true
+    else
+        return false
+    end
+end
+
 --Read the .json settings
 local settingsFile = io.open("discord-bot/settings.json", "r")
 if settingsFile then
     local content = settingsFile:read("*a")
     settingsFile:close()
     Settings = Json.decode(content)
+    print("Found the settings file!")
 else
     print("Failed to find settings file, shutdown")
     os.exit()
+end
+
+--Read the .db file
+if FileExist('discord-bot/database.db') then
+    Database = SQLite.open('discord-bot/database.db')
+    print("Found the database file!")
+    if FileExist('discord-bot/story.json') then
+        print('Found the stories file!')
+        IsStoriesEnabled = true
+    else
+        print('Failed to find the stories file')
+        IsStoriesEnabled = false
+    end
+else
+    print('Failed to find database file, disabling story commands')
+    IsStoriesEnabled = false
 end
 
 --Print a message saying that the bot is alive
@@ -133,6 +161,10 @@ CommandTable =
     ['!reload'] = function (message)
         Reload(message)
     end,
+    --Story command that will iterate the VS storyline
+    ['!story'] = function(message)
+        Story(message)
+    end,
     --Have you mooed today?
     ['!moo'] = function(message)
         Cow(message)
@@ -215,6 +247,10 @@ CommandDescription =
         'The !reload command reloads all the whitelists and banlists of all services\n' ..
         'This is a time-consuming process, which is why it is rate limited to once an hour\n' ..
         'Syntax: `!reload`',
+    ['story'] =
+        'The !story command allows you to read the choose-your-own-adventure type of story\n' ..
+        'The story command logs your user ID in a local database, together with the page and chapter number\n' ..
+        'Syntax: `!story`',
     ['moo'] =
         'Have you mooed today?\n' ..
         'Syntax: `!moo`',
@@ -478,6 +514,15 @@ function Reload(message)
             math.floor((GuildRoleTable[message.guild.name]['longDelay'] - os.time()) / 60) ..
             ' minutes before using again'
         ) return
+    end
+end
+
+--Story function
+function Story(message)
+    if isStoriesEnabled == true then
+        message.channel:send("Hello, World!")
+    else
+        message.channel:send("Sorry, but stories are unavailable :<")
     end
 end
 
