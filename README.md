@@ -36,7 +36,7 @@ SQLite is not a requirement for the bot to execute API calls, but is required to
 Installing SQLite on Debian:
 ```
 sudo apt update -y
-sudo apt install sqlite3 -y
+sudo apt install sqlite3 libsqlite3-dev -y
 ```
 
 SQLite Luvit dependency:
