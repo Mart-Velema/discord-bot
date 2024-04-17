@@ -3,6 +3,7 @@
 Discordia = require('discordia')
 Json = require('json')
 Http = require('coro-http')
+SQLite = require('sqlite3')
 Client = Discordia.Client()
 
 --Read the .json settings
