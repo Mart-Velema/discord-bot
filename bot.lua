@@ -33,6 +33,7 @@ end
 if FileExist('discord-bot/database.db') then
     print("Found the database file!")
     if FileExist('discord-bot/story.json') then
+        --If both files exist, enable stories
         print('Found the stories file!')
         Database = SQLite.open('discord-bot/database.db')
         IsStoriesEnabled = true
@@ -69,11 +70,14 @@ Client:on('roleCreate', function(role)
 end)
 
 Client:on('roleUpdate', function(role)
+    --Loop trough all the roles in the role variable
     for k,v in pairs(role) do
+        --If the current role matches that of the updated role, set the old rolename to nil
         if v == role then
             GuildRoleTable[role.guild.name][k] = nil
         end
     end
+    --Set the rolename to the correct ID
     GuildRoleTable[role.guild.name][role.name] = role
 end)
 
@@ -268,10 +272,12 @@ CommandDescription =
 --!list
 function GetList(message)
     message.channel:send('Getting list of available services...')
+
     local content =
     {
         REQUEST = 'LIST_SERVICES'
     }
+
     --Looping trough all the available services
     local response = Api(content)
     if type(response) == 'table' then
@@ -294,12 +300,16 @@ end
 --!service <name of service>
 function GetStatus(message)
     local service = message.content:sub(9)
+
     local content =
     {
         REQUEST = 'STATUS_SERVICE',
         SERVICE = service
     }
+
+    --Checking the status of a service by the API
     local status = Api(content)
+    --Converting the status from boolean to string
     if status == true then
         status = 'Online'
     elseif status == false then
@@ -324,6 +334,7 @@ function Join(message)
             'Furthermore, you will agree to have your service username linked to your Discord ID.\n' ..
             'If you wish to get the logged information, or have it removed, contact an administrator.'
         ) return
+    --Check if the string contains a :
     elseif not string.find(service, ":") then
         message.channel:send(
             'To join a service, type `!join <name of the service>:<your username of that service>`\n' ..
@@ -335,6 +346,7 @@ function Join(message)
     --substring replacement
     local serviceTable = {}
     for substring in string.gmatch(service, "[^:]+") do
+        --Splitting the string on :
         table.insert(serviceTable, string.lower(substring))
     end
 
@@ -371,7 +383,7 @@ function Leave(message)
         SERVICE = service
     }
 
-    --Assign a role to the user
+    --Removing a role to the user
     local roleToRemove = (GuildRoleTable[message.guild.name][string.gsub(service, " ", "")])
     if roleToRemove then
         author:removeRole(roleToRemove)
@@ -385,8 +397,6 @@ end
 --Gets a list of all available commands
 --!help
 function Help(message)
-
-    --Initiate the helpTable table
     local helpTable ={}
     --Fill it with the arguments supplied to the !help command
     for command in string.gmatch(message.content, "%a+") do
@@ -450,6 +460,7 @@ function Ban(message)
         USER_ID = member.id,
         REASON = 'You have been banned by an administrator'
     }
+
     message.channel:send("Preparing to ban the user: " .. member.mentionString)
 
     --Ban the user from the server
@@ -493,6 +504,7 @@ function Unban(message)
         REQUEST = 'UNBAN',
         USER_ID = member.id,
     }
+
     message.channel:send("Preparing to unban the user: " .. member.mentionString)
     message.channel:send(Api(content))
 end
