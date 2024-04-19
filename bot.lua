@@ -275,13 +275,16 @@ function GetList(message)
     --Looping trough all the available services
     local response = Api(content)
     if type(response) == 'table' then
+        --Initiating string
+        local serviceString = 'Available services:\n'
         for serviceId, serviceName in ipairs(response) do
             --First 4 are admin only, dismiss those
             if  serviceId >= 5 then
-                message.channel:send(serviceName)
+                --Adding the current service name to the string with breakline char
+                serviceString = serviceString .. serviceName .. '\n'
             end
         end
-        message.channel:send("use `!join <name of the service>:<your username of that service>` to join a specific service")
+        message.channel:send(serviceString .. "use `!join <name of the service>:<your username of that service>` to join a specific service")
     else
         message.channel:send(response)
     end
