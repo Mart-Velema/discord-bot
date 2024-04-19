@@ -31,10 +31,10 @@ end
 
 --Read the .db file
 if FileExist('discord-bot/database.db') then
-    Database = SQLite.open('discord-bot/database.db')
     print("Found the database file!")
     if FileExist('discord-bot/story.json') then
         print('Found the stories file!')
+        Database = SQLite.open('discord-bot/database.db')
         IsStoriesEnabled = true
     else
         print('Failed to find the stories file')
@@ -84,20 +84,27 @@ Client:on('messageCreate', function(message)
         return
     end
 
+    --Checking cooldown of server
     if GuildRoleTable[message.guild.name]['shortDelay'] <= os.time() then
-        --Decodes the commands based on a space in the message
-        local commands = {}
-        for command in message.content:gmatch("%S+") do
-            table.insert(commands, command)
-        end
+        --Check if the first char is an !
+        if string.sub(message.content, 1, 1) == "!" then
+            --Decodes the commands based on a space in the message
+            local commands = {}
+            for command in message.content:gmatch("%S+") do
+                table.insert(commands, command)
+            end
+            --Get the command out of the table
+            local commandFunction = CommandTable[commands[1]]
 
-        --Get the command out of the table
-        local commandFunction = CommandTable[commands[1]]
-
-        --Execute the command of the table
-        if commandFunction then
-            GuildRoleTable[message.guild.name]['shortDelay'] = os.time() + 5
-            commandFunction(message)
+            --Execute the command of the table
+            if commandFunction then
+                GuildRoleTable[message.guild.name]['shortDelay'] = os.time() + 5
+                commandFunction(message)
+            else
+                --Else, print help message
+                message.channel:send('Unknown command')
+                Help(message)
+            end
         end
     end
 end)
