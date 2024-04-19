@@ -121,10 +121,6 @@ CommandTable =
     ['!catpic'] = function(message)
         message.channel:send(GetRandomImage('https://api.thecatapi.com/v1/images/search')[1]['url'])
     end,
-    ---Reply with a radoom guinea pig image when someone says !guineapic
-    ['!guineapic'] = function(message)
-        message.channel:send(GetRandomImage('https://api.infinite-night.com/guineapic/')['image'])
-    end,
     --Reply with a list of available services
     ['!list'] = function(message)
         GetList(message)
@@ -198,10 +194,6 @@ CommandDescription =
     ['catpic'] =
         'The !catpic command responds with a random picture of a cat\n' ..
         'Syntax: `!catpic`',
-    --Reply with a random guinea pig image when someone says !guineapic
-    ['guineapic'] =
-        'The !guineapic command responds with a random picture of a guinea pic\n' ..
-        'Syntax: `!guineapic`',
     --Reply with a list of available services
     ['list'] =
         'The !list command responds with a list of available services\n' ..
@@ -345,10 +337,12 @@ function Join(message)
     }
 
     --Assign a role to the user
-    local roleToAssign = (GuildRoleTable[message.guild.name][string.gsub(serviceTable[1], " ", "")])
+    local roleToAssign = GuildRoleTable[message.guild.name][string.gsub(serviceTable[1], " ", "")]
     if roleToAssign then
         author:addRole(roleToAssign)
         message.channel:send('Granting you the role of: ' .. serviceTable[1])
+    else
+        message.channel:send('The role of: ' .. serviceTable[1] .. ' is not available')
     end
 
     message.channel:send('Trying to add ' .. content['ACCOUNT_NAME'] .. ' to the ' .. content['SERVICE'] .. ' service')
@@ -397,7 +391,6 @@ function Help(message)
             '!foxpic    > Sends a random photo of a fox\n' ..
             '!catpic    > Sends a random photo of a cat \n' ..
             '!dogpic    > Sends a random photo of a dog\n' ..
-            '!guineapic > Sends a random photo of a guinea pig\n' ..
             '!ping      > Pong!\n' ..
             '!ban       > Bans a specific user from all services and discord server\n' ..
             '!unban     > Removes all bans of specific user\n' ..
@@ -407,7 +400,7 @@ function Help(message)
             '!status    > Prints the status of the requested service \n' ..
             '!join      > Allows you to join any of the available services\n' ..
             '!leave     > Allows you to leave any of the available services\n' ..
-            '!man       > Prints the manpage entry of a specified command```'
+            '!story     > Follows one of the available stories```'
         ) return
     else
         --Store the description from the CommandDescription table
