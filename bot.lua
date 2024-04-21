@@ -26,7 +26,7 @@ if settingsFile then
     print("Found the settings file!")
 else
     print("Failed to find settings file, shutdown")
-    os.exit()
+    os.exit(false)
 end
 
 --Read the .db file
@@ -48,6 +48,19 @@ end
 
 --Print a message saying that the bot is alive
 Client:on('ready', function ()
+    --Connecting to the API
+    local content =
+    {
+        REQUEST = 'LOAD'
+    }
+    --Detecting if the connection was successful
+    if Api(content) ~= true then
+        print("Failed to connect to the API")
+        os.exit(false)
+    else
+        print("Successfully connected to the API")
+    end
+
     print('Logged in as: '  .. Client.user.username)
     --Get the roles of the servers this bot is connected to
     getRoles()
